@@ -21,11 +21,13 @@ public void onCreate(Bundle savedInstanceState) {
     TextView advice = (TextView) findViewById(R.id.report_advice);
     if (bmi > 25) {
         image.setImageResource(R.drawable.bot_fat);
+        image.animate().scaleX(1.5f).scaleY(1.5f).setDuration(4000);
         advice.setText(R.string.advice_heavy);
     }
     else if (bmi < 20)
     {
         image.setImageResource(R.drawable.bot_thin);
+        image.animate().scaleX(1.5f).scaleY(1.5f).setDuration(4000);
         advice.setText(R.string.advice_light);
     }
     else {
