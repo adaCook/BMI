@@ -1,22 +1,30 @@
 package com.example.laicooper.bmi;
 
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.widget.*;
-import android.content.Intent;
-import android.view.*;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.ContextMenu;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Spinner;
 
 
 public class MainActivity extends AppCompatActivity {
     EditText vWeight;
-    Button submitButton;
-
     String[] feetArray, inchesArray;
     int feet, inches;
     private ImageView ivContext;
+    Spinner spinnerFeet, spinnerInches;
 
     /**
      * Called when the activity is first created.
@@ -30,11 +38,11 @@ public class MainActivity extends AppCompatActivity {
         vWeight = (EditText) findViewById(R.id.weight);
         feetArray = getResources().getStringArray(R.array.feet);
         inchesArray = getResources().getStringArray(R.array.inches);
-        Spinner spinnerFeet = (Spinner) findViewById(R.id.spinner_feet);
+        spinnerFeet = (Spinner) findViewById(R.id.spinner_feet);
         ArrayAdapter<String> adapterFeet = new ArrayAdapter<String>(this,
                 R.layout.dropdown_item, feetArray);
         spinnerFeet.setAdapter(adapterFeet);
-        Spinner spinnerInches = (Spinner) findViewById(R.id.spinner_inches);
+        spinnerInches = (Spinner) findViewById(R.id.spinner_inches);
         ArrayAdapter<String> adapterInches = new ArrayAdapter<String>(this,
                 R.layout.dropdown_item, inchesArray);
         spinnerInches.setAdapter(adapterInches);
@@ -62,8 +70,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        loadPreferences();
+    }
+
     public void calcBMI(View view) {
         String weight = vWeight.getText().toString();
+        savePreferences(feet - 1, inches, weight);
         Intent intent = new Intent(this, ReportActivity.class);
         Bundle bundle = new Bundle();
         bundle.putInt("feet", feet);
@@ -71,6 +86,20 @@ public class MainActivity extends AppCompatActivity {
         bundle.putString("weight", weight);
         intent.putExtras(bundle);
         startActivity(intent);
+    }
+
+    public void savePreferences(int f, int i, String w) {
+        SharedPreferences pref = getSharedPreferences("BMI", MODE_PRIVATE);
+        pref.edit().putInt("feet", f).commit();
+        pref.edit().putInt("inches", i).commit();
+        pref.edit().putString("weight", w).commit();
+    }
+
+    public void loadPreferences() {
+        SharedPreferences pref = getSharedPreferences("BMI", MODE_PRIVATE);
+        spinnerFeet.setSelection(pref.getInt("feet", 0));
+        spinnerInches.setSelection(pref.getInt("inches", 0));
+        vWeight.setText(pref.getString("weight", "0"));
     }
 
     public void aboutBMI(View view) {
